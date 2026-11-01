@@ -95,3 +95,26 @@ def test_search_policies_rejects_non_positive_limit(service):
 
 def test_search_policies_returns_empty_when_no_terms_match(service):
     assert service.search_policies("astronauta submarino") == []
+
+
+
+
+
+def test_search_policies_prioritizes_title_matches(service):
+    results = service.search_policies(
+        "Qual é a garantia legal para defeitos?"
+    )
+
+    assert results
+    assert results[0]["id"] == "warranty"
+
+
+def test_search_policies_ignores_common_words(service):
+    results = service.search_policies("qual é o prazo da garantia")
+
+    assert results
+    assert results[0]["id"] == "warranty"
+
+
+def test_search_policies_returns_empty_when_query_has_only_stopwords(service):
+    assert service.search_policies("qual é o que") == []
