@@ -1,4 +1,3 @@
-
 from unittest.mock import Mock
 
 import pytest
@@ -23,13 +22,9 @@ def test_search_store_products_returns_products(product_tools):
         }
     ]
 
-    product_tools._product_service.search_products.return_value = (
-        expected_products
-    )
+    product_tools._product_service.search_products.return_value = expected_products
 
-    result = product_tools.search_store_products(
-        {"query": "Yamaha C40"}
-    )
+    result = product_tools.search_store_products({"query": "Yamaha C40"})
 
     assert result == {
         "success": True,
@@ -69,9 +64,7 @@ def test_search_store_products_rejects_invalid_arguments(
 def test_search_store_products_returns_not_found(product_tools):
     product_tools._product_service.search_products.return_value = []
 
-    result = product_tools.search_store_products(
-        {"query": "produto inexistente"}
-    )
+    result = product_tools.search_store_products({"query": "produto inexistente"})
 
     assert result == {
         "success": True,
@@ -81,16 +74,12 @@ def test_search_store_products_returns_not_found(product_tools):
 
 
 def test_search_store_products_handles_service_error(product_tools):
-    product_tools._product_service.search_products.side_effect = (
-        RuntimeError("Detalhe interno")
+    product_tools._product_service.search_products.side_effect = RuntimeError(
+        "Detalhe interno"
     )
 
-    result = product_tools.search_store_products(
-        {"query": "Yamaha C40"}
-    )
+    result = product_tools.search_store_products({"query": "Yamaha C40"})
 
     assert result["success"] is False
-    assert result["error"] == (
-        "Não foi possível consultar os produtos no momento."
-    )
+    assert result["error"] == ("Não foi possível consultar os produtos no momento.")
     assert "Detalhe interno" not in str(result)

@@ -1,4 +1,3 @@
-
 import unicodedata
 from typing import Any
 
@@ -7,12 +6,47 @@ from src.repositories.policy_repository import load_policies
 
 class PolicyService:
     STOPWORDS = {
-        "a", "as", "o", "os", "um", "uma", "uns", "umas",
-        "de", "da", "das", "do", "dos", "em", "no", "na",
-        "nos", "nas", "ao", "aos", "com", "por", "para",
-        "qual", "quais", "que", "e", "ou", "é", "ser",
-        "são", "como", "me", "minha", "meu", "minhas",
-        "meus", "sobre", "qual", "tem", "ter",
+        "a",
+        "as",
+        "o",
+        "os",
+        "um",
+        "uma",
+        "uns",
+        "umas",
+        "de",
+        "da",
+        "das",
+        "do",
+        "dos",
+        "em",
+        "no",
+        "na",
+        "nos",
+        "nas",
+        "ao",
+        "aos",
+        "com",
+        "por",
+        "para",
+        "qual",
+        "quais",
+        "que",
+        "e",
+        "ou",
+        "é",
+        "ser",
+        "são",
+        "como",
+        "me",
+        "minha",
+        "meu",
+        "minhas",
+        "meus",
+        "sobre",
+        "qual",
+        "tem",
+        "ter",
     }
 
     ID_WEIGHT = 4
@@ -40,11 +74,7 @@ class PolicyService:
     def _tokenize(cls, value: str) -> set[str]:
         normalized = cls._normalize(value)
 
-        return {
-            term
-            for term in normalized.split()
-            if term not in cls.STOPWORDS
-        }
+        return {term for term in normalized.split() if term not in cls.STOPWORDS}
 
     def get_policy(self, policy_id: str) -> dict[str, Any] | None:
         normalized_id = self._normalize(policy_id)
@@ -78,16 +108,22 @@ class PolicyService:
             title_terms = self._tokenize(policy.get("title", ""))
             category_terms = self._tokenize(policy.get("category", ""))
 
-            rule_terms = self._tokenize(
-                " ".join(policy.get("rules", []))
-            )
+            rule_terms = self._tokenize(" ".join(policy.get("rules", [])))
 
             score = sum(
-                self.ID_WEIGHT if term in policy_id_terms
-                else self.TITLE_WEIGHT if term in title_terms
-                else self.CATEGORY_WEIGHT if term in category_terms
-                else self.RULE_WEIGHT if term in rule_terms
-                else 0
+                (
+                    self.ID_WEIGHT
+                    if term in policy_id_terms
+                    else (
+                        self.TITLE_WEIGHT
+                        if term in title_terms
+                        else (
+                            self.CATEGORY_WEIGHT
+                            if term in category_terms
+                            else self.RULE_WEIGHT if term in rule_terms else 0
+                        )
+                    )
+                )
                 for term in query_terms
             )
 
@@ -96,7 +132,4 @@ class PolicyService:
 
         matches.sort(key=lambda item: (-item[0], item[1]))
 
-        return [
-            policy
-            for _, _, policy in matches[:limit]
-        ]
+        return [policy for _, _, policy in matches[:limit]]

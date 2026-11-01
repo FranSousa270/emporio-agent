@@ -4,7 +4,6 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 load_dotenv(PROJECT_ROOT / ".env")
@@ -20,9 +19,7 @@ def get_settings() -> Settings:
     api_key = os.getenv("GEMINI_API_KEY")
 
     if not api_key:
-        raise ValueError(
-            "A variável GEMINI_API_KEY não foi configurada."
-        )
+        raise ValueError("A variável GEMINI_API_KEY não foi configurada.")
 
     return Settings(
         gemini_api_key=api_key,

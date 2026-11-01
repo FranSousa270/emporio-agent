@@ -1,4 +1,3 @@
-
 from unittest.mock import Mock
 
 from src.tools.policy_tools import PolicyTools
@@ -11,9 +10,7 @@ def make_policy_service():
             "id": "warranty",
             "category": "warranty",
             "title": "Garantia de produtos",
-            "rules": [
-                "A garantia legal contra defeitos é de 90 dias."
-            ],
+            "rules": ["A garantia legal contra defeitos é de 90 dias."],
             "source": {"section": "7"},
             "requires_human_review": True,
         }
@@ -25,9 +22,7 @@ def test_search_store_policies_returns_matching_policies():
     service = make_policy_service()
     tools = PolicyTools(policy_service=service)
 
-    result = tools.search_store_policies({
-        "query": "garantia defeito"
-    })
+    result = tools.search_store_policies({"query": "garantia defeito"})
 
     assert result["success"] is True
     assert result["found"] is True
@@ -70,9 +65,7 @@ def test_search_store_policies_returns_not_found():
     service.search_policies.return_value = []
     tools = PolicyTools(policy_service=service)
 
-    result = tools.search_store_policies({
-        "query": "assunto inexistente"
-    })
+    result = tools.search_store_policies({"query": "assunto inexistente"})
 
     assert result["success"] is True
     assert result["found"] is False
@@ -81,14 +74,10 @@ def test_search_store_policies_returns_not_found():
 
 def test_search_store_policies_handles_service_failure():
     service = Mock()
-    service.search_policies.side_effect = RuntimeError(
-        "Erro interno de teste"
-    )
+    service.search_policies.side_effect = RuntimeError("Erro interno de teste")
     tools = PolicyTools(policy_service=service)
 
-    result = tools.search_store_policies({
-        "query": "garantia"
-    })
+    result = tools.search_store_policies({"query": "garantia"})
 
     assert result["success"] is False
     assert "error" in result

@@ -1,4 +1,3 @@
-
 import json
 import unicodedata
 from typing import Any
@@ -11,10 +10,37 @@ from src.repositories.csv_repository import load_csv
 
 class ProductService:
     STOPWORDS = {
-        "a", "as", "o", "os", "um", "uma", "de", "da", "das",
-        "do", "dos", "em", "no", "na", "nos", "nas", "com",
-        "para", "por", "qual", "quais", "que", "e", "é", "me",
-        "tem", "ter", "quero", "procurando", "produto", "produtos",
+        "a",
+        "as",
+        "o",
+        "os",
+        "um",
+        "uma",
+        "de",
+        "da",
+        "das",
+        "do",
+        "dos",
+        "em",
+        "no",
+        "na",
+        "nos",
+        "nas",
+        "com",
+        "para",
+        "por",
+        "qual",
+        "quais",
+        "que",
+        "e",
+        "é",
+        "me",
+        "tem",
+        "ter",
+        "quero",
+        "procurando",
+        "produto",
+        "produtos",
     }
 
     NAME_WEIGHT = 3
@@ -27,7 +53,7 @@ class ProductService:
 
     @staticmethod
     def _calculate_price(value: Decimal) -> Decimal:
-        return value.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)    
+        return value.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
     @staticmethod
     def _normalize(value: Any) -> str:
@@ -42,15 +68,8 @@ class ProductService:
     @classmethod
     def _tokenize(cls, value: Any) -> set[str]:
         normalized = cls._normalize(value)
-        terms = {
-            term.strip(".,!?;:()[]{}\"'")
-            for term in normalized.split()
-        }
-        return {
-            term
-            for term in terms
-            if term and term not in cls.STOPWORDS
-        }
+        terms = {term.strip(".,!?;:()[]{}\"'") for term in normalized.split()}
+        return {term for term in terms if term and term not in cls.STOPWORDS}
 
     @staticmethod
     def _is_active(value: Any) -> bool:
@@ -136,8 +155,6 @@ class ProductService:
 
         return result
 
-        
-
     def search_products(
         self,
         query: str,
@@ -170,11 +187,15 @@ class ProductService:
             specs_terms = self._tokenize(product.get("specs", ""))
 
             score = sum(
-                self.NAME_WEIGHT if term in name_terms
-                else self.DESCRIPTION_WEIGHT
-                if term in description_terms
-                else self.SPECS_WEIGHT if term in specs_terms
-                else 0
+                (
+                    self.NAME_WEIGHT
+                    if term in name_terms
+                    else (
+                        self.DESCRIPTION_WEIGHT
+                        if term in description_terms
+                        else self.SPECS_WEIGHT if term in specs_terms else 0
+                    )
+                )
                 for term in query_terms
             )
 
@@ -183,7 +204,4 @@ class ProductService:
 
         matches.sort(key=lambda item: (-item[0], item[1]))
 
-        return [
-            self._format_product(product)
-            for _, _, product in matches[:limit]
-        ]
+        return [self._format_product(product) for _, _, product in matches[:limit]]

@@ -1,4 +1,3 @@
-
 from datetime import datetime, timedelta, timezone
 from unittest.mock import Mock
 
@@ -12,18 +11,20 @@ from src.session.session_manager import Session
 
 @pytest.fixture
 def auth_service(monkeypatch):
-    customers = pd.DataFrame([
-        {
-            "customer_id": 101,
-            "name": "Cliente Teste",
-            "email": "cliente@email.com",
-        },
-        {
-            "customer_id": 102,
-            "name": "Outro Cliente",
-            "email": "outro@email.com",
-        },
-    ])
+    customers = pd.DataFrame(
+        [
+            {
+                "customer_id": 101,
+                "name": "Cliente Teste",
+                "email": "cliente@email.com",
+            },
+            {
+                "customer_id": 102,
+                "name": "Outro Cliente",
+                "email": "outro@email.com",
+            },
+        ]
+    )
 
     monkeypatch.setattr(
         auth_module,

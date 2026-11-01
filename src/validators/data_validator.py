@@ -1,4 +1,3 @@
-
 from collections.abc import Mapping
 
 REQUIRED_DATASETS = (
@@ -50,11 +49,7 @@ REQUIRED_COLUMNS = {
 def find_missing_datasets(
     datasets: Mapping[str, object],
 ) -> list[str]:
-    return [
-        dataset
-        for dataset in REQUIRED_DATASETS
-        if dataset not in datasets
-    ]
+    return [dataset for dataset in REQUIRED_DATASETS if dataset not in datasets]
 
 
 def find_missing_columns(

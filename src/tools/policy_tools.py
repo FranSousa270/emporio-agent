@@ -1,4 +1,3 @@
-
 from typing import Any
 
 from src.services.policy_service import PolicyService
@@ -34,9 +33,7 @@ class PolicyTools:
         except Exception:
             return {
                 "success": False,
-                "error": (
-                    "Não foi possível consultar as políticas no momento."
-                ),
+                "error": ("Não foi possível consultar as políticas no momento."),
             }
 
         if not policies:

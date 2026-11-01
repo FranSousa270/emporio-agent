@@ -1,6 +1,8 @@
 from types import SimpleNamespace
 from unittest.mock import Mock
 
+from google.genai import types
+
 from src.integrations import gemini_client
 
 
@@ -21,6 +23,13 @@ def test_create_gemini_client():
 
     assert client is mock_client
     mock_get_settings.assert_called_once()
+
     mock_genai_client.assert_called_once_with(
-        api_key="test-api-key"
+        api_key="test-api-key",
+        http_options=types.HttpOptions(
+            timeout=30_000,
+            retry_options=types.HttpRetryOptions(
+                attempts=1,
+            ),
+        ),
     )

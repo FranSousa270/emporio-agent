@@ -1,16 +1,17 @@
 
 import json
 
-from google.genai import Client
+from google.genai import Client, errors
 
 from src.agent.prompts import SYSTEM_INSTRUCTION
 from src.agent.conversation_history import ConversationHistory
 from src.core.config import get_settings
 from src.integrations.gemini_client import create_gemini_client
 from src.schemas.policy_schema import POLICY_SEARCH_TOOL
-from src.tools.policy_tools import PolicyTools
 from src.schemas.product_schema import PRODUCT_SEARCH_TOOL
+from src.tools.policy_tools import PolicyTools
 from src.tools.product_tools import ProductTools
+
 
 class Agent:
     MAX_TOOL_ROUNDS = 5
@@ -26,7 +27,6 @@ class Agent:
             PRODUCT_SEARCH_TOOL,
         ]
 
-    
     def _execute_tool_call(
         self,
         name: str,
@@ -55,7 +55,6 @@ class Agent:
                 "error": "Não foi possível executar a consulta no momento.",
             }
 
-
     def respond(self, user_message: str) -> str:
         if not user_message.strip():
             raise ValueError("A mensagem não pode estar vazia.")
@@ -66,25 +65,38 @@ class Agent:
         pending_tool_calls = False
 
         for _ in range(self.MAX_TOOL_ROUNDS):
-            interaction = self._client.interactions.create(
-                model=self._settings.gemini_model,
-                input=list(input_history),
-                system_instruction=SYSTEM_INSTRUCTION,
-                tools=self._tools,
-                store=False,
-            )
+            try:
+                interaction = self._client.interactions.create(
+                    model=self._settings.gemini_model,
+                    input=list(input_history),
+                    system_instruction=SYSTEM_INSTRUCTION,
+                    tools=self._tools,
+                    store=False,
+                )
+            except errors.APIError as error:
+                if error.code == 429:
+                    return (
+                        "O limite de uso da API Gemini foi atingido. "
+                        "Verifique as cotas do projeto e tente novamente "
+                        "quando houver disponibilidade."
+                    )
+
+                return (
+                    "Não foi possível consultar o assistente neste momento. "
+                    "Tente novamente mais tarde."
+                )
+            
 
             function_calls = [
                 step
                 for step in (interaction.steps or [])
                 if step.type == "function_call"
             ]
-           
 
             for step in interaction.steps or []:
                 step_data = step.model_dump()
                 turn_steps.append(step_data)
-                input_history.append(step_data) 
+                input_history.append(step_data)
 
             if not function_calls:
                 pending_tool_calls = False
@@ -97,7 +109,6 @@ class Agent:
                     name=step.name,
                     arguments=step.arguments,
                 )
-                
 
                 function_result = {
                     "type": "function_result",
@@ -118,7 +129,7 @@ class Agent:
                 input_history.append(function_result)
 
         if interaction is None:
-            raise RuntimeError("Não foi possível concluir a interação.")
+            return "Não foi possível concluir a interação."
 
         if pending_tool_calls:
             response = (

@@ -15,9 +15,7 @@ class ConversationManager:
             self._agents[session.session_id] = agent
 
         except Exception:
-            self._session_manager.close_session(
-                session.session_id
-            )
+            self._session_manager.close_session(session.session_id)
             raise
 
         return session

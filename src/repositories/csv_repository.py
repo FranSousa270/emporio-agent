@@ -2,7 +2,6 @@ from pathlib import Path
 
 import pandas as pd
 
-
 DATA_DIR = Path(__file__).resolve().parents[2] / "data" / "csv"
 
 CSV_FILES = {
@@ -30,7 +29,4 @@ def load_csv(dataset: str) -> pd.DataFrame:
 
 
 def load_all_csv() -> dict[str, pd.DataFrame]:
-    return {
-        dataset: load_csv(dataset)
-        for dataset in CSV_FILES
-    }
+    return {dataset: load_csv(dataset) for dataset in CSV_FILES}

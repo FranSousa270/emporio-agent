@@ -1,4 +1,3 @@
-
 import secrets
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
@@ -39,10 +38,7 @@ class AuthService:
         customers = load_csv("customers")
 
         matching_customers = customers[
-            customers["email"]
-            .astype("string")
-            .str.strip()
-            .str.casefold()
+            customers["email"].astype("string").str.strip().str.casefold()
             == normalized_email
         ]
 

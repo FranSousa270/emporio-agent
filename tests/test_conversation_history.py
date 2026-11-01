@@ -92,7 +92,6 @@ def test_build_input_rejects_empty_message(message):
         history.build_input(message)
 
 
-
 def test_add_step_stores_function_result():
     history = ConversationHistory()
     step = {

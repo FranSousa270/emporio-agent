@@ -1,4 +1,3 @@
-
 from unittest.mock import patch
 
 import pytest
@@ -13,9 +12,7 @@ def policies():
             "id": "business_hours",
             "category": "hours",
             "title": "Horário de funcionamento",
-            "rules": [
-                "Atendimento de segunda a sexta-feira, das 09:00 às 18:00."
-            ],
+            "rules": ["Atendimento de segunda a sexta-feira, das 09:00 às 18:00."],
         },
         {
             "id": "warranty",
@@ -23,16 +20,14 @@ def policies():
             "title": "Garantia de produtos",
             "rules": [
                 "A garantia legal contra defeitos é de 90 dias.",
-                "A garantia do fabricante varia conforme o produto."
+                "A garantia do fabricante varia conforme o produto.",
             ],
         },
         {
             "id": "delivery",
             "category": "shipping",
             "title": "Entrega e frete",
-            "rules": [
-                "O prazo de entrega depende da modalidade de envio."
-            ],
+            "rules": ["O prazo de entrega depende da modalidade de envio."],
         },
     ]
 
@@ -97,13 +92,8 @@ def test_search_policies_returns_empty_when_no_terms_match(service):
     assert service.search_policies("astronauta submarino") == []
 
 
-
-
-
 def test_search_policies_prioritizes_title_matches(service):
-    results = service.search_policies(
-        "Qual é a garantia legal para defeitos?"
-    )
+    results = service.search_policies("Qual é a garantia legal para defeitos?")
 
     assert results
     assert results[0]["id"] == "warranty"

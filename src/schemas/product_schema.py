@@ -1,4 +1,3 @@
-
 PRODUCT_SEARCH_TOOL = {
     "type": "function",
     "name": "search_store_products",
@@ -16,8 +15,7 @@ PRODUCT_SEARCH_TOOL = {
             "query": {
                 "type": "string",
                 "description": (
-                    "Nome ou termos relacionados ao produto procurado "
-                    "pelo cliente."
+                    "Nome ou termos relacionados ao produto procurado " "pelo cliente."
                 ),
             }
         },

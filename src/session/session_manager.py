@@ -5,9 +5,7 @@ from uuid import uuid4
 
 @dataclass
 class Session:
-    session_id: str = field(
-        default_factory=lambda: str(uuid4())
-    )
+    session_id: str = field(default_factory=lambda: str(uuid4()))
 
     authenticated: bool = False
     customer_id: str | int | None = None
@@ -15,9 +13,7 @@ class Session:
     product_search_context: dict[str, Any] | None = None
     order_search_context: dict[str, Any] | None = None
 
-    pending_requests: list[dict[str, Any]] = field(
-        default_factory=list
-    )
+    pending_requests: list[dict[str, Any]] = field(default_factory=list)
 
 
 class SessionManager:

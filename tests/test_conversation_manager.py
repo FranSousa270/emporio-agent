@@ -30,7 +30,7 @@ def test_start_conversation(mock_agent):
 
     assert session.session_id is not None
     assert manager.get_session(session.session_id) is session
-    assert manager.get_agent(session.session_id) is mock_agent[0]   
+    assert manager.get_agent(session.session_id) is mock_agent[0]
 
 
 def test_start_multiple_independent_conversations(mock_agent):
@@ -41,9 +41,8 @@ def test_start_multiple_independent_conversations(mock_agent):
 
     assert first_session.session_id != second_session.session_id
 
-    assert (
-        manager.get_agent(first_session.session_id)
-        is not manager.get_agent(second_session.session_id)
+    assert manager.get_agent(first_session.session_id) is not manager.get_agent(
+        second_session.session_id
     )
 
 
@@ -72,10 +71,7 @@ def test_close_conversation_when_agent_close_fails(mock_agent):
 
     session = manager.start_conversation()
 
-   
-    mock_agent[0].close.side_effect = RuntimeError(
-    "Erro ao fechar cliente"
-)
+    mock_agent[0].close.side_effect = RuntimeError("Erro ao fechar cliente")
     with pytest.raises(RuntimeError, match="Erro ao fechar cliente"):
         manager.close_conversation(session.session_id)
 
@@ -86,9 +82,7 @@ def test_close_conversation_when_agent_close_fails(mock_agent):
 def test_start_conversation_when_agent_initialization_fails(
     monkeypatch,
 ):
-    mock_agent_factory = Mock(
-        side_effect=RuntimeError("Falha na inicialização")
-    )
+    mock_agent_factory = Mock(side_effect=RuntimeError("Falha na inicialização"))
 
     monkeypatch.setattr(
         manager_module,

@@ -1,4 +1,3 @@
-
 import pandas as pd
 import pytest
 
@@ -8,11 +7,13 @@ from src.repositories import csv_repository
 def test_load_csv_successfully(tmp_path, monkeypatch):
     file_path = tmp_path / "products.csv"
 
-    expected = pd.DataFrame({
-        "product_id": [1, 2],
-        "name": ["Guitar", "Keyboard"],
-        "price_brl": [1500.0, 2500.0],
-    })
+    expected = pd.DataFrame(
+        {
+            "product_id": [1, 2],
+            "name": ["Guitar", "Keyboard"],
+            "price_brl": [1500.0, 2500.0],
+        }
+    )
 
     expected.to_csv(file_path, index=False)
 
@@ -46,15 +47,19 @@ def test_load_csv_with_missing_file(tmp_path, monkeypatch):
 
 
 def test_load_all_csv_successfully(tmp_path, monkeypatch):
-    products = pd.DataFrame({
-        "product_id": [1],
-        "name": ["Guitar"],
-    })
+    products = pd.DataFrame(
+        {
+            "product_id": [1],
+            "name": ["Guitar"],
+        }
+    )
 
-    categories = pd.DataFrame({
-        "category_id": [1],
-        "name": ["Strings"],
-    })
+    categories = pd.DataFrame(
+        {
+            "category_id": [1],
+            "name": ["Strings"],
+        }
+    )
 
     products.to_csv(tmp_path / "products.csv", index=False)
     categories.to_csv(tmp_path / "categories.csv", index=False)

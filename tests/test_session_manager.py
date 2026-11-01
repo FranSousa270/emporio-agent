@@ -30,9 +30,7 @@ def test_get_existing_session():
 
     created_session = manager.create_session()
 
-    retrieved_session = manager.get_session(
-        created_session.session_id
-    )
+    retrieved_session = manager.get_session(created_session.session_id)
 
     assert retrieved_session is created_session
 
@@ -89,9 +87,11 @@ def test_sessions_have_independent_search_contexts():
         "current_page": 1,
     }
 
-    first_session.pending_requests.append({
-        "type": "complaint",
-    })
+    first_session.pending_requests.append(
+        {
+            "type": "complaint",
+        }
+    )
 
     assert first_session.product_search_context is not None
     assert second_session.product_search_context is None

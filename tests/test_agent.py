@@ -5,6 +5,7 @@ import pytest
 
 from src.agent import agent as agent_module
 from src.agent.prompts import SYSTEM_INSTRUCTION
+from google.genai import errors
 
 
 @pytest.fixture
@@ -49,9 +50,7 @@ def create_model_step(text):
 
 
 def test_agent_initialization(mock_agent_dependencies):
-    mock_client, mock_get_settings, mock_create_client = (
-        mock_agent_dependencies
-    )
+    mock_client, mock_get_settings, mock_create_client = mock_agent_dependencies
 
     agent = agent_module.Agent()
 
@@ -63,15 +62,9 @@ def test_agent_initialization(mock_agent_dependencies):
 def test_agent_responds_with_gemini(mock_agent_dependencies):
     mock_client, _, _ = mock_agent_dependencies
 
-    mock_client.interactions.create.return_value = (
-        SimpleNamespace(
-            output_text="Olá! Sou o assistente virtual.",
-            steps=[
-                create_model_step(
-                    "Olá! Sou o assistente virtual."
-                )
-            ],
-        )
+    mock_client.interactions.create.return_value = SimpleNamespace(
+        output_text="Olá! Sou o assistente virtual.",
+        steps=[create_model_step("Olá! Sou o assistente virtual.")],
     )
 
     agent = agent_module.Agent()
@@ -106,18 +99,12 @@ def test_agent_preserves_conversation_history(
 
     first_response = SimpleNamespace(
         output_text="Olá! Como posso ajudar?",
-        steps=[
-            create_model_step("Olá! Como posso ajudar?")
-        ],
+        steps=[create_model_step("Olá! Como posso ajudar?")],
     )
 
     second_response = SimpleNamespace(
         output_text="Temos diversos modelos disponíveis.",
-        steps=[
-            create_model_step(
-                "Temos diversos modelos disponíveis."
-            )
-        ],
+        steps=[create_model_step("Temos diversos modelos disponíveis.")],
     )
 
     mock_client.interactions.create.side_effect = [
@@ -133,9 +120,7 @@ def test_agent_preserves_conversation_history(
 
     assert response == "Temos diversos modelos disponíveis."
 
-    second_call = (
-        mock_client.interactions.create.call_args_list[1]
-    )
+    second_call = mock_client.interactions.create.call_args_list[1]
 
     sent_history = second_call.kwargs["input"]
 
@@ -144,10 +129,7 @@ def test_agent_preserves_conversation_history(
     assert sent_history[1]["type"] == "model_output"
     assert sent_history[2]["type"] == "user_input"
 
-    assert (
-        sent_history[2]["content"][0]["text"]
-        == "Quais modelos vocês têm?"
-    )
+    assert sent_history[2]["content"][0]["text"] == "Quais modelos vocês têm?"
 
 
 def test_agent_rejects_empty_message(mock_agent_dependencies):
@@ -192,9 +174,7 @@ def test_agent_history_is_isolated_between_instances(
     first_agent.respond("Olá!")
     second_agent.respond("Olá novamente!")
 
-    assert first_agent._history.get_history() != (
-        second_agent._history.get_history()
-    )
+    assert first_agent._history.get_history() != (second_agent._history.get_history())
 
 
 def test_agent_does_not_save_history_when_api_fails(
@@ -202,9 +182,7 @@ def test_agent_does_not_save_history_when_api_fails(
 ):
     mock_client, _, _ = mock_agent_dependencies
 
-    mock_client.interactions.create.side_effect = RuntimeError(
-        "API indisponível"
-    )
+    mock_client.interactions.create.side_effect = RuntimeError("API indisponível")
 
     agent = agent_module.Agent()
 
@@ -214,14 +192,37 @@ def test_agent_does_not_save_history_when_api_fails(
     assert agent._history.get_history() == []
 
 
+def test_agent_handles_gemini_quota_exceeded(
+    mock_agent_dependencies,
+):
+    mock_client, _, _ = mock_agent_dependencies
+
+    mock_client.interactions.create.side_effect = errors.APIError(
+        code=429,
+        response_json={
+            "error": {
+                "code": 429,
+                "message": "Resource exhausted",
+                "status": "RESOURCE_EXHAUSTED",
+            }
+        },
+    )
+
+    agent = agent_module.Agent()
+
+    response = agent.respond("Olá!")
+
+    assert "limite de uso da API Gemini foi atingido" in response
+    assert mock_client.interactions.create.call_count == 1
+    assert agent._history.get_history() == []
+
+
 def test_agent_clear_history(mock_agent_dependencies):
     mock_client, _, _ = mock_agent_dependencies
 
-    mock_client.interactions.create.return_value = (
-        SimpleNamespace(
-            output_text="Olá!",
-            steps=[create_model_step("Olá!")],
-        )
+    mock_client.interactions.create.return_value = SimpleNamespace(
+        output_text="Olá!",
+        steps=[create_model_step("Olá!")],
     )
 
     agent = agent_module.Agent()
@@ -230,7 +231,6 @@ def test_agent_clear_history(mock_agent_dependencies):
     agent._history.clear()
 
     assert agent._history.get_history() == []
-
 
 
 def test_agent_executes_policy_tool_and_returns_final_response(
@@ -258,16 +258,12 @@ def test_agent_executes_policy_tool_and_returns_final_response(
             {
                 "id": "warranty",
                 "title": "Garantia de produtos",
-                "rules": [
-                    "A garantia legal contra defeitos é de 90 dias."
-                ],
+                "rules": ["A garantia legal contra defeitos é de 90 dias."],
             }
         ],
     }
 
-    final_step = create_model_step(
-        "A garantia legal contra defeitos é de 90 dias."
-    )
+    final_step = create_model_step("A garantia legal contra defeitos é de 90 dias.")
 
     mock_client.interactions.create.side_effect = [
         SimpleNamespace(
@@ -281,15 +277,11 @@ def test_agent_executes_policy_tool_and_returns_final_response(
     ]
 
     agent = agent_module.Agent()
-    agent._policy_tools.search_store_policies = Mock(
-        return_value=tool_result
-    )
+    agent._policy_tools.search_store_policies = Mock(return_value=tool_result)
 
     response = agent.respond("Qual é o prazo da garantia?")
 
-    assert response == (
-        "A garantia legal contra defeitos é de 90 dias."
-    )
+    assert response == ("A garantia legal contra defeitos é de 90 dias.")
 
     agent._policy_tools.search_store_policies.assert_called_once_with(
         {"query": "garantia defeito"}
@@ -297,15 +289,12 @@ def test_agent_executes_policy_tool_and_returns_final_response(
 
     assert mock_client.interactions.create.call_count == 2
 
-    second_call_input = (
-        mock_client.interactions.create.call_args_list[1]
-        .kwargs["input"]
-    )
+    second_call_input = mock_client.interactions.create.call_args_list[1].kwargs[
+        "input"
+    ]
 
     function_results = [
-        step
-        for step in second_call_input
-        if step.get("type") == "function_result"
+        step for step in second_call_input if step.get("type") == "function_result"
     ]
 
     assert len(function_results) == 1
@@ -355,7 +344,5 @@ def test_agent_stops_after_max_tool_rounds(mock_agent_dependencies):
 
     response = agent.respond("Qual é a política de garantia?")
 
-    assert mock_client.interactions.create.call_count == (
-        agent.MAX_TOOL_ROUNDS
-    )
+    assert mock_client.interactions.create.call_count == (agent.MAX_TOOL_ROUNDS)
     assert "Não consegui concluir" in response

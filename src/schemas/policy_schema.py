@@ -1,4 +1,3 @@
-
 POLICY_SEARCH_TOOL = {
     "type": "function",
     "name": "search_store_policies",

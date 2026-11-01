@@ -1,4 +1,3 @@
-
 import pandas as pd
 import pytest
 from unittest.mock import patch
@@ -8,62 +7,66 @@ from src.services.product_service import ProductService
 
 @pytest.fixture
 def products():
-    return pd.DataFrame([
-        {
-            "product_id": 1,
-            "name": "Violão Acústico",
-            "description": "Violão com cordas de nylon",
-            "price_brl": 599.90,
-            "stock_quantity": 10,
-            "status": "active",
-            "specs": '{"strings": "nylon"}',
-        },
-        {
-            "product_id": 2,
-            "name": "Guitarra Elétrica",
-            "description": "Guitarra para apresentações",
-            "price_brl": 1200.00,
-            "stock_quantity": 0,
-            "status": "active",
-            "specs": '{"electronics": "yes"}',
-        },
-        {
-            "product_id": 3,
-            "name": "Baixo Descontinuado",
-            "description": "Baixo elétrico",
-            "price_brl": 900.00,
-            "stock_quantity": 5,
-            "status": "discontinued",
-            "specs": "{}",
-        },
-    ])
+    return pd.DataFrame(
+        [
+            {
+                "product_id": 1,
+                "name": "Violão Acústico",
+                "description": "Violão com cordas de nylon",
+                "price_brl": 599.90,
+                "stock_quantity": 10,
+                "status": "active",
+                "specs": '{"strings": "nylon"}',
+            },
+            {
+                "product_id": 2,
+                "name": "Guitarra Elétrica",
+                "description": "Guitarra para apresentações",
+                "price_brl": 1200.00,
+                "stock_quantity": 0,
+                "status": "active",
+                "specs": '{"electronics": "yes"}',
+            },
+            {
+                "product_id": 3,
+                "name": "Baixo Descontinuado",
+                "description": "Baixo elétrico",
+                "price_brl": 900.00,
+                "stock_quantity": 5,
+                "status": "discontinued",
+                "specs": "{}",
+            },
+        ]
+    )
 
 
 @pytest.fixture
 def promotions():
-    return pd.DataFrame([
-        {
-            "promotion_id": 10,
-            "product_id": 1,
-            "discount_percent": 10,
-            "description": "Oferta especial",
-            "is_active": 1,
-        },
-        {
-            "promotion_id": 11,
-            "product_id": 2,
-            "discount_percent": 20,
-            "description": "Oferta sem estoque",
-            "is_active": 1,
-        },
-        {
-            "promotion_id": 12,
-            "product_id": 3,
-            "discount_percent": 15,
-            "description": "Oferta descontinuada",
-            "is_active": 1,
-        },
-    ])
+    return pd.DataFrame(
+        [
+            {
+                "promotion_id": 10,
+                "product_id": 1,
+                "discount_percent": 10,
+                "description": "Oferta especial",
+                "is_active": 1,
+            },
+            {
+                "promotion_id": 11,
+                "product_id": 2,
+                "discount_percent": 20,
+                "description": "Oferta sem estoque",
+                "is_active": 1,
+            },
+            {
+                "promotion_id": 12,
+                "product_id": 3,
+                "discount_percent": 15,
+                "description": "Oferta descontinuada",
+                "is_active": 1,
+            },
+        ]
+    )
 
 
 @pytest.fixture
@@ -113,7 +116,6 @@ def test_search_products_rejects_non_positive_limit(service):
         service.search_products("violão", limit=0)
 
 
-
 def test_product_without_promotion_has_pix_discount(service, products, promotions):
     promotions = promotions[promotions["product_id"] != 1]
 
@@ -132,7 +134,6 @@ def test_product_without_promotion_has_pix_discount(service, products, promotion
     assert result["pix_price_brl"] == 569.91
     assert result["final_price_brl"] == 599.90
     assert result["promotion"] is None
-
 
 
 def test_active_promotion_applies_discount_without_pix(service):

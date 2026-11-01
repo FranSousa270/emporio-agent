@@ -1,4 +1,3 @@
-
 import json
 
 import pytest
@@ -17,9 +16,7 @@ def valid_policy_data():
             {
                 "id": "business_hours",
                 "title": "Horário de funcionamento",
-                "rules": [
-                    "A loja funciona de segunda a sexta-feira."
-                ],
+                "rules": ["A loja funciona de segunda a sexta-feira."],
             }
         ],
     }
@@ -46,9 +43,7 @@ def policies_file(tmp_path, monkeypatch, valid_policy_data):
 def test_load_policies_returns_valid_data(policies_file):
     data = policy_repository.load_policies()
 
-    assert data["document"]["title"] == (
-        "Manual de Políticas e Procedimentos"
-    )
+    assert data["document"]["title"] == ("Manual de Políticas e Procedimentos")
     assert data["policies"][0]["id"] == "business_hours"
 
 
@@ -108,10 +103,12 @@ def test_load_policies_raises_when_policies_is_not_a_list(
     policies_file,
 ):
     policies_file.write_text(
-        json.dumps({
-            "document": {},
-            "policies": {},
-        }),
+        json.dumps(
+            {
+                "document": {},
+                "policies": {},
+            }
+        ),
         encoding="utf-8",
     )
 

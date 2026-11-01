@@ -6,6 +6,7 @@ from src.validators.data_validator import (
     validate_dataset_structure,
 )
 
+
 def test_find_missing_datasets_when_all_are_present():
     datasets = {
         "products": object(),
@@ -108,7 +109,7 @@ def test_find_missing_columns_ignores_missing_datasets():
 
     result = find_missing_columns(datasets)
 
-    assert result == {}    
+    assert result == {}
 
 
 def test_validate_dataset_structure_when_all_are_valid():
@@ -123,12 +124,8 @@ def test_validate_dataset_structure_when_all_are_valid():
                 "status",
             ]
         ),
-        "categories": pd.DataFrame(
-            columns=["category_id", "name"]
-        ),
-        "customers": pd.DataFrame(
-            columns=["customer_id", "name"]
-        ),
+        "categories": pd.DataFrame(columns=["category_id", "name"]),
+        "customers": pd.DataFrame(columns=["customer_id", "name"]),
         "orders": pd.DataFrame(
             columns=[
                 "order_id",
@@ -137,9 +134,7 @@ def test_validate_dataset_structure_when_all_are_valid():
                 "order_date",
             ]
         ),
-        "order_items": pd.DataFrame(
-            columns=["order_id", "product_id", "quantity"]
-        ),
+        "order_items": pd.DataFrame(columns=["order_id", "product_id", "quantity"]),
         "promotions": pd.DataFrame(
             columns=[
                 "promotion_id",
@@ -182,6 +177,7 @@ def test_validate_dataset_structure_when_dataset_is_missing():
         "promotions",
     ]
 
+
 def test_validate_dataset_structure_when_column_is_missing():
     datasets = {
         "products": pd.DataFrame(
@@ -209,4 +205,4 @@ def test_validate_dataset_structure_when_column_is_missing():
             "price_brl",
             "status",
         ]
-    }            
+    }
