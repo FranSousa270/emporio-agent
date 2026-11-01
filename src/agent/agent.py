@@ -9,7 +9,8 @@ from src.core.config import get_settings
 from src.integrations.gemini_client import create_gemini_client
 from src.schemas.policy_schema import POLICY_SEARCH_TOOL
 from src.tools.policy_tools import PolicyTools
-
+from src.schemas.product_schema import PRODUCT_SEARCH_TOOL
+from src.tools.product_tools import ProductTools
 
 class Agent:
     MAX_TOOL_ROUNDS = 5
@@ -19,19 +20,18 @@ class Agent:
         self._client: Client = create_gemini_client()
         self._history = ConversationHistory()
         self._policy_tools = PolicyTools()
-        self._tools = [POLICY_SEARCH_TOOL]
+        self._product_tools = ProductTools()
+        self._tools = [
+            POLICY_SEARCH_TOOL,
+            PRODUCT_SEARCH_TOOL,
+        ]
 
+    
     def _execute_tool_call(
         self,
         name: str,
         arguments: dict,
     ) -> dict:
-        if name != "search_store_policies":
-            return {
-                "success": False,
-                "error": "A ferramenta solicitada não está disponível.",
-            }
-
         if not isinstance(arguments, dict):
             return {
                 "success": False,
@@ -39,12 +39,22 @@ class Agent:
             }
 
         try:
-            return self._policy_tools.search_store_policies(arguments)
+            if name == "search_store_policies":
+                return self._policy_tools.search_store_policies(arguments)
+
+            if name == "search_store_products":
+                return self._product_tools.search_store_products(arguments)
+
+            return {
+                "success": False,
+                "error": "A ferramenta solicitada não está disponível.",
+            }
         except Exception:
             return {
                 "success": False,
                 "error": "Não foi possível executar a consulta no momento.",
             }
+
 
     def respond(self, user_message: str) -> str:
         if not user_message.strip():
