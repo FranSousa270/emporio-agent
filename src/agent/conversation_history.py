@@ -21,7 +21,16 @@ class ConversationHistory:
                 ],
             },
         ]
+    
+    def add_step(self, step: dict[str, Any]) -> None:
+        if not isinstance(step, dict):
+            raise TypeError("A etapa deve ser um dicionário.")
+        if not step.get("type"):
+            raise ValueError("A etapa deve possuir um tipo.")
+        self._steps.append(step)
 
+
+    
     def add_turn(self, user_message: str, model_steps: list[Any]) -> None:
         if not user_message.strip():
             raise ValueError("A mensagem não pode estar vazia.")
@@ -37,7 +46,11 @@ class ConversationHistory:
         })
 
         for step in model_steps:
-            self._steps.append(step.model_dump())
+            if isinstance(step, dict):
+                self._steps.append(step)
+            else:
+                self._steps.append(step.model_dump())
+
 
     def get_history(self) -> list[dict[str, Any]]:
         return list(self._steps)

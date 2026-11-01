@@ -1,0 +1,303 @@
+{
+    "document": {
+        "title": "Manual de Políticas e Procedimentos",
+        "organization": "Empório da Música",
+        "version": "2.1",
+        "last_updated": "2025-06",
+        "source_file": "data/políticas_da_loja.pdf"
+    },
+    "policies": [
+        {
+            "id": "store_scope",
+            "category": "general",
+            "title": "Escopo de atuação da loja",
+            "rules": [
+                "A Empório da Música comercializa exclusivamente instrumentos musicais.",
+                "A loja não comercializa acessórios como cordas, palhetas, cabos, cases, pedais ou amplificadores."
+            ],
+            "source": {
+                "section": "1",
+                "page": 1
+            },
+            "requires_human_review": false
+        },
+        {
+            "id": "business_hours",
+            "category": "hours",
+            "title": "Horário de funcionamento",
+            "rules": [
+                "De segunda a sexta-feira, o atendimento funciona das 09:00 às 18:00.",
+                "Aos sábados, o atendimento funciona das 09:00 às 13:00.",
+                "Aos domingos e feriados, a loja permanece fechada.",
+                "O atendimento via WhatsApp segue os mesmos horários.",
+                "Fora do expediente, o atendimento deve informar o horário de retorno.",
+                "Em datas especiais, o horário pode ser estendido, com comunicação antecipada nas redes sociais e no WhatsApp."
+            ],
+            "source": {
+                "section": "2",
+                "page": 2
+            },
+            "requires_human_review": false
+        },
+        {
+            "id": "payment_methods",
+            "category": "payments",
+            "title": "Formas de pagamento",
+            "rules": [
+                "PIX: pagamento à vista com desconto de 5% sobre o preço de tabela.",
+                "Cartão de débito: pagamento à vista.",
+                "Cartão de crédito: até 12 parcelas sem juros, respeitando as regras de parcelamento.",
+                "Boleto bancário: pagamento à vista, com compensação em até 3 dias úteis.",
+                "A combinação de formas de pagamento é permitida para compras acima de R$ 2.000,00."
+            ],
+            "installment_rules": [
+                {
+                    "installments": "1-3",
+                    "interest": 0,
+                    "minimum_installment_brl": 0,
+                    "exception": "Compras com parcela inferior a R$ 50,00 não se enquadram na regra sem valor mínimo."
+                },
+                {
+                    "installments": "4-6",
+                    "interest": 0,
+                    "minimum_installment_brl": 80
+                },
+                {
+                    "installments": "7-12",
+                    "interest": 0,
+                    "minimum_installment_brl": 100
+                }
+            ],
+            "source": {
+                "section": "3",
+                "page": 3
+            },
+            "requires_human_review": true
+        },
+        {
+            "id": "online_purchase_regret",
+            "category": "returns",
+            "title": "Arrependimento de compra online",
+            "rules": [
+                "O cliente pode solicitar a devolução por arrependimento em até 7 dias corridos após o recebimento da compra online.",
+                "O produto deve estar sem uso, na embalagem original e acompanhado dos acessórios e manuais.",
+                "O reembolso deve ocorrer pela mesma forma de pagamento, em até 10 dias úteis.",
+                "O frete da devolução é de responsabilidade da loja.",
+                "O agente deve coletar os dados necessários e não prometer aprovação fora das condições documentadas."
+            ],
+            "source": {
+                "section": "4.1"
+            },
+            "requires_human_review": false
+        },
+        {
+            "id": "defective_product",
+            "category": "returns",
+            "title": "Troca por defeito",
+            "rules": [
+                "A política prevê troca por defeito em até 30 dias corridos após a compra.",
+                "Após esse prazo, o cliente deve ser orientado sobre a garantia do fabricante.",
+                "Danos decorrentes de mau uso não são cobertos pela política de troca por defeito.",
+                "O agente deve coletar o produto, a data pertinente e a descrição do problema antes de encaminhar o caso.",
+                "O agente não deve aprovar automaticamente troca, reembolso ou cobertura de garantia."
+            ],
+            "source": {
+                "section": "4.2"
+            },
+            "requires_human_review": true
+        },
+        {
+            "id": "preference_exchange",
+            "category": "returns",
+            "title": "Troca por preferência",
+            "rules": [
+                "A troca por preferência pode ser solicitada em até 7 dias, conforme as condições da política.",
+                "O produto deve estar em perfeito estado e na embalagem original.",
+                "A troca depende da disponibilidade do produto.",
+                "Diferenças de preço podem ser cobradas ou reembolsadas, conforme o caso.",
+                "O agente não deve prometer aprovação antes da avaliação das condições aplicáveis."
+            ],
+            "source": {
+                "section": "4.3"
+            },
+            "requires_human_review": true
+        },
+        {
+            "id": "exchange_exclusions",
+            "category": "returns",
+            "title": "Itens não elegíveis para troca",
+            "rules": [
+                "Instrumentos personalizados ou com ajustes sob encomenda não são elegíveis para troca.",
+                "Itens identificados como venda final em liquidação não são elegíveis para troca.",
+                "Boquilhas não são elegíveis para troca por razões de higiene.",
+                "As exclusões desta seção se aplicam à modalidade de troca descrita no manual e não devem ser automaticamente estendidas às modalidades de arrependimento ou defeito.",
+                "Se houver dúvida sobre a aplicação de uma exclusão a outra modalidade, o caso deve ser encaminhado à gerência."
+            ],
+            "source": {
+                "section": "4.4"
+            },
+            "requires_human_review": true
+        },
+        {
+            "id": "warranty",
+            "category": "warranty",
+            "title": "Garantia legal e do fabricante",
+            "rules": [
+                "A garantia legal contra defeitos de fabricação é de 90 dias, contados do recebimento do produto.",
+                "A garantia do fabricante pode variar de 6 meses a 2 anos, conforme o produto e seu certificado.",
+                "A garantia não cobre desgaste natural, mau uso, quedas, condições climáticas extremas, modificações ou reparos não autorizados, nem danos estéticos sem impacto funcional.",
+                "O agente deve distinguir as informações relatadas pelo cliente da cobertura efetivamente confirmada.",
+                "A avaliação técnica ou da gerência é necessária quando houver dúvida sobre a cobertura.",
+                "O agente não deve garantir que um defeito específico será coberto sem a avaliação pertinente."
+            ],
+            "source": {
+                "section": "7"
+            },
+            "requires_human_review": true
+        },
+        {
+            "id": "delivery",
+            "category": "shipping",
+            "title": "Entrega e frete",
+            "rules": [
+                "Na região metropolitana de Campo Grande/MS, o frete é grátis para compras acima de R$ 500,00.",
+                "Na região metropolitana de Campo Grande/MS, compras abaixo de R$ 500,00 têm taxa fixa de entrega de R$ 35,00.",
+                "O prazo de entrega na região metropolitana de Campo Grande/MS é de 1 a 3 dias úteis, por motoboy próprio.",
+                "Para outras cidades, as modalidades e os prazos previstos são: Correios PAC de 5 a 12 dias úteis, SEDEX de 2 a 5 dias úteis e Jadlog de 3 a 8 dias úteis.",
+                "Para outras cidades, o frete depende do CEP, peso e dimensões do produto.",
+                "Instrumentos grandes podem exigir cotação especial, que deve ser solicitada à equipe.",
+                "O agente não deve inventar uma cotação quando não houver dados suficientes."
+            ],
+            "source": {
+                "section": "5"
+            },
+            "requires_human_review": true
+        },
+        {
+            "id": "tracking",
+            "category": "shipping",
+            "title": "Rastreamento de pedidos",
+            "rules": [
+                "O código de rastreamento é enviado automaticamente por e-mail e WhatsApp quando o pedido é despachado.",
+                "O agente só deve consultar e apresentar dados de pedidos após a autenticação do cliente.",
+                "Se o pedido estiver despachado e houver código de rastreamento cadastrado, o agente pode apresentar esse código.",
+                "Se o código não estiver disponível, o agente deve informar que ele não consta nos dados acessíveis.",
+                "O agente não deve simular consulta em site de transportadora nem afirmar que verificou o rastreamento em tempo real."
+            ],
+            "source": {
+                "section": "6"
+            },
+            "requires_human_review": false
+        },
+        {
+            "id": "delivery_damage",
+            "category": "complaints",
+            "title": "Avarias na entrega",
+            "rules": [
+                "Se o cliente identificar uma avaria enquanto o entregador ainda estiver presente, deve ser orientado a recusar o recebimento e contatar imediatamente a loja.",
+                "Se o cliente já tiver recebido o produto avariado, o agente deve registrar as informações pertinentes e encaminhar o caso à gerência.",
+                "Para o caso encaminhado, a política prevê retorno em até 24 horas úteis.",
+                "O agente não deve inventar procedimentos para produtos já recebidos com avaria.",
+                "O agente não deve afirmar que a transportadora foi acionada nem prometer troca, reembolso ou reposição sem confirmação."
+            ],
+            "source": {
+                "section": "5"
+            },
+            "requires_human_review": true
+        },
+        {
+            "id": "order_cancellation",
+            "category": "orders",
+            "title": "Solicitação de cancelamento",
+            "rules": [
+                "O cliente deve ser autenticado antes de consultar os dados do pedido.",
+                "O agente deve verificar o status do pedido antes de orientar sobre uma solicitação de cancelamento.",
+                "Se o pedido já constar como cancelado, o agente deve informar o status registrado, sem inventar informações sobre reembolso.",
+                "Nos demais casos, o agente deve registrar a solicitação e encaminhá-la à gerência.",
+                "O agente não pode executar o cancelamento nem prometer reembolso ou estorno.",
+                "O retorno de solicitações encaminhadas deve ser informado em até 24 horas úteis, conforme a política de atendimento."
+            ],
+            "source": {
+                "section": "6"
+            },
+            "requires_human_review": true
+        },
+        {
+            "id": "complaints",
+            "category": "customer_service",
+            "title": "Reclamações e solicitações",
+            "rules": [
+                "O atendimento deve receber reclamações com empatia e profissionalismo.",
+                "O agente deve identificar o motivo da reclamação e coletar progressivamente apenas os dados necessários.",
+                "Quando pertinente, o agente deve consultar as informações disponíveis sobre o pedido ou produto.",
+                "O agente deve registrar a solicitação e encaminhá-la à equipe responsável.",
+                "A política prevê retorno em até 24 horas úteis para reclamações encaminhadas.",
+                "O agente não deve prometer solução, compensação, troca ou reembolso sem autorização."
+            ],
+            "source": {
+                "section": "8"
+            },
+            "requires_human_review": true
+        },
+        {
+            "id": "privacy_lgpd",
+            "category": "privacy",
+            "title": "Privacidade e proteção de dados",
+            "rules": [
+                "Os dados pessoais devem ser utilizados para processamento de pedidos, entrega e comunicação de status e rastreamento.",
+                "Dados pessoais só podem ser utilizados para marketing mediante consentimento explícito.",
+                "Os dados dos clientes não devem ser compartilhados para fins de marketing sem o consentimento aplicável.",
+                "O cliente pode solicitar a exclusão de seus dados por WhatsApp ou e-mail.",
+                "O agente deve registrar e encaminhar solicitações de exclusão, sem afirmar que os dados foram efetivamente excluídos.",
+                "O agente deve solicitar apenas os dados necessários à finalidade do atendimento.",
+                "O agente nunca deve expor dados de um cliente a outro.",
+                "E-mail e telefone, isoladamente, não comprovam a identidade do cliente para acesso a pedidos.",
+                "Dúvidas sobre providências de privacidade devem ser encaminhadas à equipe responsável."
+            ],
+            "source": {
+                "section": "9"
+            },
+            "requires_human_review": true
+        },
+        {
+            "id": "promotions",
+            "category": "pricing",
+            "title": "Promoções e descontos",
+            "rules": [
+                "As promoções não são cumulativas.",
+                "O desconto de 5% no PIX não deve ser aplicado sobre um preço já promocional.",
+                "Uma oferta promocional depende da disponibilidade de estoque.",
+                "Não há garantia de manutenção de uma promoção após o término ou esgotamento do estoque.",
+                "Quando apresentar um preço promocional, o agente deve informar também o preço original e o percentual de desconto.",
+                "O agente deve consultar os dados disponíveis antes de informar preços, descontos ou disponibilidade.",
+                "Se houver dúvida sobre promoções simultâneas ou aplicação de uma regra não documentada, o caso deve ser encaminhado à gerência."
+            ],
+            "source": {
+                "section": "6"
+            },
+            "requires_human_review": true
+        },
+        {
+            "id": "general_service",
+            "category": "customer_service",
+            "title": "Regras gerais de atendimento",
+            "rules": [
+                "O atendimento deve ser informal, profissional e acolhedor, sem formalidade excessiva.",
+                "O agente deve identificar-se como assistente virtual na primeira interação e nunca fingir ser uma pessoa.",
+                "Durante o expediente, a política estabelece resposta em até 5 minutos.",
+                "Fora do expediente, o agente deve informar o horário de retorno.",
+                "O agente nunca deve informar preço, estoque ou prazo sem consultar os dados disponíveis.",
+                "A loja comercializa exclusivamente instrumentos musicais; pedidos de acessórios devem ser redirecionados.",
+                "Dúvidas sobre a aplicação de políticas devem ser encaminhadas à gerência.",
+                "Decisões gerenciais, como aprovações excepcionais, não podem ser tomadas autonomamente pelo agente.",
+                "Quando não houver dados suficientes, o agente deve explicar a limitação sem inventar informações.",
+                "Quando houver falha na consulta, o agente deve informar que não conseguiu confirmar os dados e oferecer encaminhamento.",
+                "O encaminhamento é simulado quando não existe integração real; o agente não deve afirmar que a equipe recebeu uma solicitação sem confirmação."
+            ],
+            "source": {
+                "section": "8"
+            },
+            "requires_human_review": true
+        }
+    ]
+}

@@ -90,3 +90,49 @@ def test_build_input_rejects_empty_message(message):
 
     with pytest.raises(ValueError):
         history.build_input(message)
+
+
+
+def test_add_step_stores_function_result():
+    history = ConversationHistory()
+    step = {
+        "type": "function_result",
+        "name": "search_store_policies",
+        "call_id": "call-123",
+        "result": {"found": True},
+    }
+
+    history.add_step(step)
+
+    assert history.get_history() == [step]
+
+
+def test_add_step_rejects_non_dictionary():
+    history = ConversationHistory()
+
+    with pytest.raises(TypeError):
+        history.add_step("function_result")
+
+
+def test_add_step_rejects_missing_type():
+    history = ConversationHistory()
+
+    with pytest.raises(ValueError):
+        history.add_step({"name": "search_store_policies"})
+
+
+def test_add_turn_stores_dictionary_steps():
+    history = ConversationHistory()
+    function_result = {
+        "type": "function_result",
+        "name": "search_store_policies",
+        "call_id": "call-123",
+        "result": [{"type": "text", "text": '{"found": true}'}],
+    }
+
+    history.add_turn("Qual é o prazo da garantia?", [function_result])
+
+    stored_history = history.get_history()
+
+    assert stored_history[0]["type"] == "user_input"
+    assert stored_history[1] == function_result

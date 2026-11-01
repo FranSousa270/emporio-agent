@@ -81,6 +81,7 @@ def test_agent_responds_with_gemini(mock_agent_dependencies):
     assert response == "Olá! Sou o assistente virtual."
 
     mock_client.interactions.create.assert_called_once_with(
+        tools=agent._tools,
         model="gemini-3.8-flash",
         input=[
             {
@@ -229,3 +230,132 @@ def test_agent_clear_history(mock_agent_dependencies):
     agent._history.clear()
 
     assert agent._history.get_history() == []
+
+
+
+def test_agent_executes_policy_tool_and_returns_final_response(
+    mock_agent_dependencies,
+):
+    mock_client, _, _ = mock_agent_dependencies
+
+    function_call = SimpleNamespace(
+        type="function_call",
+        name="search_store_policies",
+        arguments={"query": "garantia defeito"},
+        id="call-123",
+        model_dump=lambda: {
+            "type": "function_call",
+            "name": "search_store_policies",
+            "arguments": {"query": "garantia defeito"},
+            "id": "call-123",
+        },
+    )
+
+    tool_result = {
+        "success": True,
+        "found": True,
+        "policies": [
+            {
+                "id": "warranty",
+                "title": "Garantia de produtos",
+                "rules": [
+                    "A garantia legal contra defeitos é de 90 dias."
+                ],
+            }
+        ],
+    }
+
+    final_step = create_model_step(
+        "A garantia legal contra defeitos é de 90 dias."
+    )
+
+    mock_client.interactions.create.side_effect = [
+        SimpleNamespace(
+            output_text="",
+            steps=[function_call],
+        ),
+        SimpleNamespace(
+            output_text="A garantia legal contra defeitos é de 90 dias.",
+            steps=[final_step],
+        ),
+    ]
+
+    agent = agent_module.Agent()
+    agent._policy_tools.search_store_policies = Mock(
+        return_value=tool_result
+    )
+
+    response = agent.respond("Qual é o prazo da garantia?")
+
+    assert response == (
+        "A garantia legal contra defeitos é de 90 dias."
+    )
+
+    agent._policy_tools.search_store_policies.assert_called_once_with(
+        {"query": "garantia defeito"}
+    )
+
+    assert mock_client.interactions.create.call_count == 2
+
+    second_call_input = (
+        mock_client.interactions.create.call_args_list[1]
+        .kwargs["input"]
+    )
+
+    function_results = [
+        step
+        for step in second_call_input
+        if step.get("type") == "function_result"
+    ]
+
+    assert len(function_results) == 1
+    assert function_results[0]["call_id"] == "call-123"
+    assert "90 dias" in function_results[0]["result"][0]["text"]
+
+
+def test_agent_rejects_unknown_tool(mock_agent_dependencies):
+    _, _, _ = mock_agent_dependencies
+    agent = agent_module.Agent()
+
+    result = agent._execute_tool_call(
+        name="delete_all_orders",
+        arguments={},
+    )
+
+    assert result["success"] is False
+    assert "error" in result
+    assert "delete_all_orders" not in result["error"]
+
+
+def test_agent_stops_after_max_tool_rounds(mock_agent_dependencies):
+    mock_client, _, _ = mock_agent_dependencies
+
+    function_call = SimpleNamespace(
+        type="function_call",
+        name="search_store_policies",
+        arguments={"query": "garantia"},
+        id="call-repeated",
+        model_dump=lambda: {
+            "type": "function_call",
+            "name": "search_store_policies",
+            "arguments": {"query": "garantia"},
+            "id": "call-repeated",
+        },
+    )
+
+    mock_client.interactions.create.return_value = SimpleNamespace(
+        output_text="",
+        steps=[function_call],
+    )
+
+    agent = agent_module.Agent()
+    agent._policy_tools.search_store_policies = Mock(
+        return_value={"success": True, "found": False, "policies": []}
+    )
+
+    response = agent.respond("Qual é a política de garantia?")
+
+    assert mock_client.interactions.create.call_count == (
+        agent.MAX_TOOL_ROUNDS
+    )
+    assert "Não consegui concluir" in response
