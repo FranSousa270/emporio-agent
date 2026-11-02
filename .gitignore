@@ -3,6 +3,7 @@
 
 .env
 
+data/complaints.json
 
 __pycache__/
 *.py[cod]
