@@ -1,4 +1,3 @@
-
 import json
 
 from google.genai import Client, errors
@@ -11,6 +10,9 @@ from src.schemas.policy_schema import POLICY_SEARCH_TOOL
 from src.schemas.product_schema import PRODUCT_SEARCH_TOOL
 from src.tools.policy_tools import PolicyTools
 from src.tools.product_tools import ProductTools
+from google.genai._gaos.lib.compat_errors import APIConnectionError
+from src.schemas.complaint_schema import COMPLAINT_REGISTER_TOOL
+from src.tools.complaint_tools import ComplaintTools
 
 
 class Agent:
@@ -22,9 +24,11 @@ class Agent:
         self._history = ConversationHistory()
         self._policy_tools = PolicyTools()
         self._product_tools = ProductTools()
+        self._complaint_tools = ComplaintTools()
         self._tools = [
             POLICY_SEARCH_TOOL,
             PRODUCT_SEARCH_TOOL,
+            COMPLAINT_REGISTER_TOOL,
         ]
 
     def _execute_tool_call(
@@ -44,6 +48,9 @@ class Agent:
 
             if name == "search_store_products":
                 return self._product_tools.search_store_products(arguments)
+
+            if name == "register_customer_complaint":
+                return self._complaint_tools.register_customer_complaint(arguments)
 
             return {
                 "success": False,
@@ -73,6 +80,11 @@ class Agent:
                     tools=self._tools,
                     store=False,
                 )
+            except APIConnectionError:
+                return (
+                    "Não foi possível estabelecer uma conexão com o assistente. "
+                    "Verifique sua conexão e tente novamente."
+                )
             except errors.APIError as error:
                 if error.code == 429:
                     return (
@@ -85,7 +97,6 @@ class Agent:
                     "Não foi possível consultar o assistente neste momento. "
                     "Tente novamente mais tarde."
                 )
-            
 
             function_calls = [
                 step

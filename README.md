@@ -1,10 +1,10 @@
 # Empório da Música — Assistente Virtual com IA
 
-Assistente virtual de atendimento ao cliente desenvolvido em Python para o desafio técnico de AI Engineer da Artefact. O projeto utiliza o Gemini para interpretar mensagens em português e acionar ferramentas que consultam o catálogo de produtos e as políticas da loja.
+Assistente virtual de atendimento ao cliente desenvolvido em Python para o desafio técnico de AI Engineer da Artefact. O projeto utiliza o Gemini para interpretar mensagens em português e acionar ferramentas que consultam o catálogo de produtos, as políticas da loja e registram reclamações de clientes.
 
 ## Tecnologias
 
-- **Python 3.15**
+- **Python 3.15** — linguagem principal do projeto.
 - **Google Gen AI SDK** — integração com o Gemini e Function Calling nativo.
 - **Pandas** — leitura e processamento dos arquivos CSV.
 - **Pydantic** — validação e estruturação de dados.
@@ -16,13 +16,18 @@ Assistente virtual de atendimento ao cliente desenvolvido em Python para o desaf
 
 - Interface de conversação via terminal.
 - Histórico de mensagens mantido em memória durante a execução do agente.
-- Busca de produtos ativos no catálogo, com limite de cinco resultados.
+- Busca de produtos ativos no catálogo, com paginação de até cinco resultados por página.
+- Continuação de pesquisas de produtos com preservação dos termos da consulta e controle de páginas disponíveis.
 - Consulta de informações de preço, estoque e promoções disponíveis nos dados.
 - Aplicação das regras de preço promocional e desconto para pagamento via PIX, conforme os dados retornados pelas ferramentas.
 - Busca textual nas políticas da loja, com normalização de acentos e pontuação e classificação por relevância.
-- Function Calling para permitir que o Gemini solicite consultas às ferramentas implementadas.
-- Tratamento de erros da API Gemini, incluindo limites de cota.
-- Testes automatizados para componentes do projeto.
+- Registro local de reclamações, com validação dos campos obrigatórios e geração de protocolo.
+- Armazenamento dos registros de reclamações em arquivo JSON.
+- Function Calling para permitir que o Gemini solicite consultas e operações às ferramentas implementadas.
+- Tratamento de erros da API Gemini, incluindo problemas de conexão e limites de cota.
+- Testes automatizados para os componentes do projeto.
+
+O registro de reclamações não representa uma aprovação de troca, devolução ou reembolso e não envia notificações externas à equipe responsável.
 
 ## Arquitetura
 
@@ -36,9 +41,10 @@ emporio-agent/
 │   │   ├── order_items.csv
 │   │   ├── products.csv
 │   │   └── promotions.csv
-│   └── policies/
-│       ├── políticas_da_loja.pdf
-│       └── policies.json
+│   ├── policies/
+│   │   ├── políticas_da_loja.pdf
+│   │   └── policies.json
+│   └── complaints.json          # Gerado durante a execução
 ├── src/
 │   ├── agent/
 │   │   ├── agent.py
@@ -52,6 +58,7 @@ emporio-agent/
 │   │   ├── csv_repository.py
 │   │   └── policy_repository.py
 │   ├── schemas/
+│   │   ├── complaint_schema.py
 │   │   ├── policy_schema.py
 │   │   └── product_schema.py
 │   ├── services/
@@ -61,33 +68,38 @@ emporio-agent/
 │   │   ├── conversation_manager.py
 │   │   └── session_manager.py
 │   ├── tools/
+│   │   ├── complaint_tools.py
 │   │   ├── policy_tools.py
 │   │   └── product_tools.py
 │   ├── validators/
 │   │   └── data_validator.py
 │   └── main.py
 ├── tests/
+├── examples/
 ├── .env.example
 ├── .gitignore
 ├── requirements.txt
 └── README.md
 ```
 
-**Responsabilidades principais:**
+### Responsabilidades principais
 
 - `agent/`: coordenação das interações com o modelo, instruções do sistema e histórico.
 - `integrations/`: configuração do cliente da API Gemini.
 - `repositories/`: acesso aos arquivos CSV e aos dados de políticas.
 - `services/`: regras de busca e processamento de produtos e políticas.
 - `schemas/`: declarações das ferramentas disponibilizadas ao modelo.
-- `tools/`: validação dos argumentos e execução das consultas solicitadas pelo agente.
+- `tools/`: validação dos argumentos e execução das operações solicitadas pelo agente.
 - `session/`: estruturas para gerenciamento de sessões.
 - `validators/`: validação estrutural dos conjuntos de dados.
 - `tests/`: testes automatizados.
+- `examples/`: exemplos de conversas que demonstram o comportamento do agente.
+
+O arquivo `data/complaints.json` é criado automaticamente quando necessário. Ele armazena os registros de reclamações e não deve ser publicado, pois pode conter dados pessoais fornecidos durante a execução.
 
 ## Pré-requisitos
 
-- Python 3.15, ou uma versão compatível com as dependências fixadas.
+- Python 3.15 ou uma versão compatível com as dependências fixadas.
 - Uma chave de API do Google Gemini.
 - Acesso à internet para as chamadas ao modelo.
 
@@ -127,14 +139,16 @@ Copie o arquivo de exemplo:
 Copy-Item .env.example .env
 ```
 
-Edite o `.env` e informe sua chave de API:
+Edite o arquivo `.env` e informe sua chave de API e o modelo Gemini configurado no projeto:
 
 ```dotenv
 GEMINI_API_KEY=sua_chave_de_api
-GEMINI_MODEL=gemini-3.8-flash
+GEMINI_MODEL=gemini-3.6-flash
 ```
 
-Mantenha a chave privada e não a publique no repositório.
+O nome do modelo acima deve corresponder a um modelo disponível para a API e compatível com a integração utilizada.
+
+Mantenha o arquivo `.env` privado. Não publique a chave de API no repositório.
 
 ### 5. Execute o agente
 
@@ -168,6 +182,10 @@ python -m pytest -v
 
 Os testes automatizados verificam componentes do sistema e utilizam mocks nos cenários em que não é necessário realizar chamadas reais à API.
 
+A paginação de produtos é coberta por testes que verificam a recuperação dos resultados por página, a ausência de sobreposição entre páginas consecutivas, o comportamento quando não existem mais resultados e a validação dos parâmetros de consulta.
+
+Os testes das ferramentas de reclamações verificam o registro dos dados, a preservação de registros existentes e o tratamento de argumentos inválidos e arquivos com conteúdo inválido.
+
 ## Formatação
 
 O código Python foi formatado com Black.
@@ -194,44 +212,10 @@ python -m pip install black
 
 ### Gemini com Function Calling nativo
 
-Foi utilizado o SDK oficial `google-genai`, com declarações de ferramentas para que o modelo possa solicitar consultas ao catálogo de produtos e às políticas da loja.
+Foi utilizado o SDK oficial `google-genai`, com declarações de ferramentas para que o modelo possa solicitar consultas ao catálogo de produtos, às políticas da loja e o registro de reclamações.
 
 Essa abordagem mantém a integração próxima à API oficial e evita introduzir frameworks adicionais de orquestração em um projeto de escopo delimitado.
 
 ### Separação de responsabilidades
 
-O código separa agente, integração externa, repositórios, serviços, ferramentas e esquemas. Isso facilita os testes e permite evoluir as regras de negócio sem concentrar toda a implementação em um único arquivo.
-
-### Busca determinística
-
-A busca por produtos e políticas é realizada em Python. A normalização textual e a pontuação de relevância tornam os resultados menos dependentes da interpretação do modelo.
-
-As regras de preço e desconto são calculadas pela aplicação, utilizando `Decimal` para evitar imprecisões comuns em operações monetárias com ponto flutuante.
-
-### Histórico em memória
-
-O histórico de interação é mantido em memória durante a execução do agente. Não há persistência de conversas em banco de dados.
-
-## Limitações conhecidas
-
-- O catálogo utilizado é composto por arquivos CSV fornecidos para o desafio; não existe integração com um sistema comercial em tempo real.
-- A busca textual é baseada em correspondência lexical e pontuação de relevância, não em busca semântica por embeddings.
-- O histórico de conversa não é persistido após o encerramento do processo.
-- Embora existam componentes de gerenciamento de sessões no projeto, a interface de terminal atual instancia o agente diretamente.
-- As ferramentas atualmente integradas ao agente permitem consultar produtos e políticas. Fluxos completos de autenticação de clientes, consulta de pedidos, cancelamento e devolução ainda não estão conectados à interface de conversação.
-- A disponibilidade e o funcionamento das chamadas ao modelo dependem dos limites e das condições da API Gemini.
-
-## Melhorias futuras
-
-- Integrar os fluxos de autenticação e consulta de pedidos.
-- Conectar o gerenciamento de sessões à interface de conversação.
-- Adicionar persistência de sessões e histórico, com controles adequados de privacidade.
-- Expandir os testes de integração e os testes dos fluxos completos do agente.
-- Evoluir a busca por políticas com recuperação híbrida, combinando relevância lexical e busca semântica.
-- Adicionar observabilidade para chamadas de ferramentas, latência e erros, sem registrar dados pessoais desnecessários.
-
-## Uso de ferramentas de inteligência artificial
-
-O Gemini é utilizado como modelo de linguagem do próprio sistema desenvolvido. Ferramentas de assistência ao desenvolvimento, incluindo o ChatGPT, também foram utilizadas durante a implementação para apoiar atividades de programação, depuração, testes e documentação.
-
-As decisões de arquitetura, a integração das ferramentas e a validação do comportamento do projeto foram conduzidas durante o desenvolvimento, com testes automatizados para verificar os componentes implementados.
+O código separa agente, integração externa, repositórios, serviços, ferramentas e esquemas. Isso facilita os testes e permite evoluir as regras de negócio sem concentrar toda a implementação em um único

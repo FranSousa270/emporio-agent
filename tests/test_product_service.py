@@ -81,6 +81,33 @@ def service(products, promotions):
         return ProductService()
 
 
+@pytest.fixture
+def paginated_service(promotions):
+    products = pd.DataFrame(
+        [
+            {
+                "product_id": product_id,
+                "name": f"Violão Acústico Modelo {product_id}",
+                "description": "Violão com cordas de nylon",
+                "price_brl": 500.00 + product_id,
+                "stock_quantity": 10,
+                "status": "active",
+                "specs": '{"strings": "nylon"}',
+            }
+            for product_id in range(1, 9)
+        ]
+    )
+
+    with patch(
+        "src.services.product_service.load_csv",
+        side_effect=lambda dataset: {
+            "products": products,
+            "promotions": promotions,
+        }[dataset],
+    ):
+        return ProductService()
+
+
 def test_search_products_finds_name_match(service):
     results = service.search_products("violão acústico")
 
@@ -158,3 +185,58 @@ def test_product_specs_are_parsed(service):
     result = service.search_products("violão")[0]
 
     assert result["specs"] == {"strings": "nylon"}
+
+
+def test_search_products_returns_empty_for_page_without_results(service):
+    assert service.search_products("violão", page=2) == []
+
+
+def test_search_products_rejects_non_positive_page(service):
+    with pytest.raises(ValueError, match="página deve ser um inteiro maior que zero"):
+        service.search_products("violão", page=0)
+
+
+@pytest.mark.parametrize("page", [True, 1.5, "2"])
+def test_search_products_rejects_invalid_page_type(service, page):
+    with pytest.raises(ValueError, match="página deve ser um inteiro maior que zero"):
+        service.search_products("violão", page=page)
+
+
+def test_search_products_returns_first_page(paginated_service):
+    results = paginated_service.search_products(
+        "violão",
+        limit=5,
+        page=1,
+    )
+
+    assert len(results) == 5
+    assert [product["product_id"] for product in results] == [1, 2, 3, 4, 5]
+
+
+def test_search_products_returns_second_page_without_duplicates(paginated_service):
+    first_page = paginated_service.search_products(
+        "violão",
+        limit=5,
+        page=1,
+    )
+    second_page = paginated_service.search_products(
+        "violão",
+        limit=5,
+        page=2,
+    )
+
+    first_ids = [product["product_id"] for product in first_page]
+    second_ids = [product["product_id"] for product in second_page]
+
+    assert second_ids == [6, 7, 8]
+    assert set(first_ids).isdisjoint(second_ids)
+
+
+def test_search_products_returns_empty_for_page_after_last(paginated_service):
+    results = paginated_service.search_products(
+        "violão",
+        limit=5,
+        page=3,
+    )
+
+    assert results == []

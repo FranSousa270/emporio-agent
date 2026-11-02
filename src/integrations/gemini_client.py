@@ -10,7 +10,7 @@ def create_gemini_client() -> genai.Client:
     return genai.Client(
         api_key=settings.gemini_api_key,
         http_options=types.HttpOptions(
-            timeout=30_000,
+            timeout=120_000,
             retry_options=types.HttpRetryOptions(attempts=1),
         ),
     )

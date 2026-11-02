@@ -17,14 +17,9 @@ class Settings:
 
 def get_settings() -> Settings:
     api_key = os.getenv("GEMINI_API_KEY")
+    gemini_model = os.getenv("GEMINI_MODEL")
 
     if not api_key:
         raise ValueError("A variável GEMINI_API_KEY não foi configurada.")
 
-    return Settings(
-        gemini_api_key=api_key,
-        gemini_model=os.getenv(
-            "GEMINI_MODEL",
-            "gemini-3.8-flash",
-        ),
-    )
+    return Settings(gemini_api_key=api_key, gemini_model=gemini_model)

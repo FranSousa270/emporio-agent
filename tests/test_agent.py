@@ -346,3 +346,64 @@ def test_agent_stops_after_max_tool_rounds(mock_agent_dependencies):
 
     assert mock_client.interactions.create.call_count == (agent.MAX_TOOL_ROUNDS)
     assert "Não consegui concluir" in response
+
+
+def test_agent_executes_complaint_tool_and_returns_final_response(
+    mock_agent_dependencies,
+):
+    mock_client, _, _ = mock_agent_dependencies
+
+    complaint_data = {
+        "customer_name": "Teste Júnior da Silva",
+        "phone": "21-99900-2120",
+        "email": "teste@gmail.com",
+        "product_name": "Yamaha C40",
+        "purchase_date": "13/10/2026",
+        "description": "O instrumento perde a afinação.",
+    }
+
+    function_call = SimpleNamespace(
+        type="function_call",
+        name="register_customer_complaint",
+        arguments=complaint_data,
+        id="complaint-call-123",
+        model_dump=lambda: {
+            "type": "function_call",
+            "name": "register_customer_complaint",
+            "arguments": complaint_data,
+            "id": "complaint-call-123",
+        },
+    )
+
+    final_step = create_model_step(
+        "Sua reclamação foi registrada sob o protocolo REC-20261102-ABC123 "
+        "e aguarda análise da equipe responsável."
+    )
+
+    mock_client.interactions.create.side_effect = [
+        SimpleNamespace(output_text="", steps=[function_call]),
+        SimpleNamespace(
+            output_text=(
+                "Sua reclamação foi registrada sob o protocolo "
+                "REC-20261102-ABC123 e aguarda análise da equipe responsável."
+            ),
+            steps=[final_step],
+        ),
+    ]
+
+    agent = agent_module.Agent()
+    agent._complaint_tools.register_customer_complaint = Mock(
+        return_value={
+            "success": True,
+            "protocol": "REC-20261102-ABC123",
+            "status": "pending_review",
+        }
+    )
+
+    response = agent.respond("Quero registrar uma reclamação sobre meu violão.")
+
+    assert "REC-20261102-ABC123" in response
+    agent._complaint_tools.register_customer_complaint.assert_called_once_with(
+        complaint_data
+    )
+    assert mock_client.interactions.create.call_count == 2

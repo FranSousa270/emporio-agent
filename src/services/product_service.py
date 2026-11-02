@@ -159,12 +159,27 @@ class ProductService:
         self,
         query: str,
         limit: int = 5,
+        page: int = 1,
+        page_size: int | None = None,
     ) -> list[dict[str, Any]]:
         if not query.strip():
             return []
 
-        if limit < 1:
-            raise ValueError("O limite deve ser maior que zero.")
+        if isinstance(limit, bool) or not isinstance(limit, int) or limit < 1:
+            raise ValueError("O limite deve ser um inteiro maior que zero.")
+
+        if isinstance(page, bool) or not isinstance(page, int) or page < 1:
+            raise ValueError("A página deve ser um inteiro maior que zero.")
+
+        if page_size is None:
+            page_size = limit
+
+        if (
+            isinstance(page_size, bool)
+            or not isinstance(page_size, int)
+            or page_size < 1
+        ):
+            raise ValueError("O tamanho da página deve ser um inteiro maior que zero.")
 
         query_terms = self._tokenize(query)
 
@@ -204,4 +219,7 @@ class ProductService:
 
         matches.sort(key=lambda item: (-item[0], item[1]))
 
-        return [self._format_product(product) for _, _, product in matches[:limit]]
+        start = (page - 1) * page_size
+        end = start + limit
+
+        return [self._format_product(product) for _, _, product in matches[start:end]]

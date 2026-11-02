@@ -27,7 +27,7 @@ def test_create_gemini_client():
     mock_genai_client.assert_called_once_with(
         api_key="test-api-key",
         http_options=types.HttpOptions(
-            timeout=30_000,
+            timeout=120_000,
             retry_options=types.HttpRetryOptions(
                 attempts=1,
             ),
